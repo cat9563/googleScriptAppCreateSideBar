@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Metro 4 -->
+    <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+  </head>
+  <body>
+    <h1>Cloudfactory</h1>
+
+    <div>
+      <button id="formatButton" class="button success">Format</button>
+      <button id="deleteButton" class="button alert">Delete</button> 
+    </div>
+      <table id="worksheetsTable" class="table striped table-border mt-4"
+        data-role="table"
+        data-rows="5"
+        data-rows-steps="5, 10"
+        data-show-activity="false"
+        data-rownum="true"
+        data-check="true"
+        data-check-style="2">
+        <thead>
+          <tr>
+            <th data-sortable="true">Worksheet</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <!-- Metro 4 -->
+    <script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
+    <script>
+    const WorksheetDeleteApp = {}
+
+    WorksheetDeleteApp.afterSidebarLoads = function(){
+      WorksheetDeleteApp.worksheetsTable = Metro.getPlugin("#worksheetsTable", "table")
+      WorksheetDeleteApp.loadWorksheetNames()
+      // google.script.run.withSuccessHandler(sheetNames => {
+      //   WorksheetDeleteApp.worksheetsTable.setItems(sheetNames)
+      //   WorksheetDeleteApp.worksheetsTable.reload()
+      // }).getWorksheetNames() 
+    } //afterSideBar Loads
+
+    WorksheetDeleteApp.loadWorksheetNames = function(){
+      google.script.run.withSuccessHandler(sheetNames => {
+        WorksheetDeleteApp.worksheetsTable.setItems(sheetNames)
+        WorksheetDeleteApp.worksheetsTable.reload()
+      }).getWorksheetNames() 
+
+    } // loadWorksheetNames
+
+    WorksheetDeleteApp.deleteSheets = function(){
+      const sheetNamesToDelete = WorksheetDeleteApp.worksheetsTable.getSelectedItems().map(r => r[0])
+      const sheetNamesToDeleteAsString = JSON.stringify(sheetNamesToDelete)
+      //console.log(sheetNamesToDelete)
+      google.script.run.withSuccessHandler(() => {
+        WorksheetDeleteApp.loadWorksheetNames()
+      }).deleteWorksheets(sheetNamesToDeleteAsString)
+    } //deletesworksheets
+
+    WorksheetDeleteApp.formatSheets = function(){
+      const sheetNamesToFormat = WorksheetDeleteApp.worksheetsTable.getSelectedItems().map(r => r[0])
+      const sheetNamesToFormatAsString = JSON.stringify(sheetNamesToFormat)
+      // console.log(sheetNamesToFormat)
+      google.script.run.withSuccessHandler(() => {
+        // WorksheetDeleteApp.loadWorksheetNames()
+      }).formatWorkSheets(sheetNamesToFormatAsString)
+    }
+    document.addEventListener("DOMContentLoaded",WorksheetDeleteApp.afterSidebarLoads)
+    document.getElementById("deleteButton").addEventListener("click",WorksheetDeleteApp.deleteSheets)
+    document.getElementById("formatButton").addEventListener("click",WorksheetDeleteApp.formatSheets)
+      
+    </script>
+  </body>
+</html>
